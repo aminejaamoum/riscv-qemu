@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>riscv-qemu by ucb-bar</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>riscv-qemu</h1>
+          <h2>QEMU with RISC-V Emulation Support</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/ucb-bar/riscv-qemu/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/ucb-bar/riscv-qemu/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/ucb-bar/riscv-qemu" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="riscv-qemu-" class="anchor" href="#riscv-qemu-"><span class="octicon octicon-link"></span></a>riscv-qemu <a href="https://travis-ci.org/ucb-bar/riscv-qemu"><img src="https://travis-ci.org/ucb-bar/riscv-qemu.svg?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>The riscv-softmmu target for full system emulation is currently supported. 
+It supports booting <a href="https://github.com/ucb-bar/riscv-linux">riscv-linux</a> (currently requires building from the 
+<a href="https://github.com/ucb-bar/riscv-linux/tree/qemu">qemu branch</a>). A precompiled copy of the kernel is included in the "hacking" 
+directory for convenience (see Method 1 under installation).</p>
+
+<h2>
+<a name="installation-" class="anchor" href="#installation-"><span class="octicon octicon-link"></span></a>Installation </h2>
+
+<h3>
+<a name="method-1-the-quick-way" class="anchor" href="#method-1-the-quick-way"><span class="octicon octicon-link"></span></a>Method 1 (the quick way):</h3>
+
+<p>A sample kernel with an initramfs is included in the "hacking"
+directory. You can easily test out riscv-qemu this way:</p>
+
+<div class="highlight highlight-sh"><pre><span class="nv">$ </span>git clone git@github.com:ucb-bar/riscv-qemu.git
+<span class="nv">$ </span><span class="nb">cd </span>riscv-qemu
+<span class="nv">$ </span>git submodule update --init pixman
+<span class="nv">$ </span>./configure --target-list<span class="o">=</span>riscv-softmmu
+<span class="nv">$ </span>make
+<span class="nv">$ </span><span class="nb">cd </span>riscv-softmmu
+<span class="nv">$ </span><span class="c"># now, start qemu</span>
+<span class="nv">$ </span>./qemu-system-riscv -kernel ../hacking/vmlinux/vmlinux -nographic
+</pre></div>
+
+<p>To exit this system, hit <code>ctrl-a x</code>.</p>
+
+<h3>
+<a name="method-2-system-with-persistent-storage" class="anchor" href="#method-2-system-with-persistent-storage"><span class="octicon octicon-link"></span></a>Method 2 (system with persistent storage):</h3>
+
+<p>Booting from a block device is also supported. A more extensive guide for 
+configuring the kernel/building a root fs will be available soon.</p>
+
+<h4>
+<a name="step-1" class="anchor" href="#step-1"><span class="octicon octicon-link"></span></a>Step 1:</h4>
+
+<div class="highlight highlight-sh"><pre><span class="nv">$ </span>git clone git@github.com:ucb-bar/riscv-qemu.git
+<span class="nv">$ </span><span class="nb">cd </span>riscv-qemu
+<span class="nv">$ </span>git submodule update --init pixman
+<span class="nv">$ </span>./configure --target-list<span class="o">=</span>riscv-softmmu
+<span class="nv">$ </span>make
+<span class="nv">$ </span><span class="nb">cd </span>riscv-softmmu
+</pre></div>
+
+<h4>
+<a name="step-2" class="anchor" href="#step-2"><span class="octicon octicon-link"></span></a>Step 2:</h4>
+
+<p>Instructions for the following two steps are coming soon:</p>
+
+<p><strong>a)</strong> Build linux kernel from the qemu branch of riscv-linux with htif block device support.</p>
+
+<p><strong>b)</strong> Build the <code>root.bin</code> root filesystem.</p>
+
+<h4>
+<a name="step-3" class="anchor" href="#step-3"><span class="octicon octicon-link"></span></a>Step 3:</h4>
+
+<p>Now from the <code>riscv-softmmu/</code> directory, start <code>qemu-system-riscv</code>:</p>
+
+<div class="highlight highlight-sh"><pre><span class="nv">$ </span>./qemu-system-riscv -hda <span class="o">[</span>your root.bin location<span class="o">]</span> -kernel <span class="o">[</span>your vmlinux location<span class="o">]</span> -nographic
+</pre></div>
+
+<p><strong>IMPORTANT</strong>: To cleanly exit this system, you must enter <code>halt -f</code> at the prompt
+and then hit <code>ctrl-a x</code>. Otherwise, the root filesystem will likely be corrupted.</p>
+
+<h2>
+<a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>Notes</h2>
+
+<ul>
+<li>Qemu also supports a "linux-user" mode, however this is currently not implemented for RISC-V.</li>
+<li>Once in a while, you may see a message from qemu of the form <code>main-loop: WARNING: I/O thread spun for N iterations</code>. You may safely ignore this message without consequence.</li>
+<li>Files/directories of interest:
+
+<ul>
+<li>target-riscv/</li>
+<li>hw/riscv/</li>
+</ul>
+</li>
+</ul>
+        </section>
+
+        <footer>
+          riscv-qemu is maintained by <a href="https://github.com/ucb-bar">ucb-bar</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
