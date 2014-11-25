@@ -74,7 +74,7 @@ uint64_t identity_translate(void *opaque, uint64_t addr)
     return addr;
 }
 
-static int64_t load_kernel (void)
+/*static int64_t load_kernel (void)
 {
     int64_t kernel_entry, kernel_high;
     int big_endian;
@@ -88,7 +88,7 @@ static int64_t load_kernel (void)
         exit(1);
     }
     return kernel_entry;
-}
+}*/
 
 static void main_cpu_reset(void *opaque)
 {
@@ -153,16 +153,28 @@ static void riscv_board_init(QEMUMachineInitArgs *args)
     memory_region_add_subregion(system_memory, 0x0, main_mem);
 
     if (kernel_filename) {
-        /* Write a small bootloader to the flash location. */
         loaderparams.ram_size = ram_size;
         loaderparams.kernel_filename = kernel_filename;
         loaderparams.kernel_cmdline = kernel_cmdline;
         loaderparams.initrd_filename = initrd_filename;
-        load_kernel();
+
+
+	FILE * a = fopen(kernel_filename, "r");
+	int wordbuf;
+	int q;
+
+	for (q = 0; q < (0x1 << 24); q += 4) {
+		fread(&wordbuf, 4, 1, a);
+		stl_p(memory_region_get_ram_ptr(main_mem) + q, wordbuf);
+	}
     }
 
     // write memory amount in MiB to 0x0
     stl_p(memory_region_get_ram_ptr(main_mem), loaderparams.ram_size >> 20);
+
+	//open file
+
+
 
 #ifdef CONFIG_RISCV_HTIF
     serial_mm_init(system_memory, 0x3f8, 0, env->irq[4], 1843200/16, serial_hds[0],
